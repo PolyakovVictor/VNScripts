@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-import json
 
 # Функция для отправки вопросов и вариантов ответов
 
@@ -26,26 +25,9 @@ data = {
     'password': 'alivudfoa'
 }
 
-headers = {
-    'Content-Type': 'application/x-www-form-urlencoded'  # Устанавливаем Content-Type
-}
 
-
-response = requests.post(login_url, data=data, headers=headers, allow_redirects=True)
-
-print(*response.history[1].cookies)
-
-if response.history:
-    # Получаем окончательный ответ после перенаправления
-    final_response = response.history[-1]
-
-    # Извлекаем файлы cookie из окончательного ответа
-    cookies = final_response.cookies
-else:
-    # Перенаправления не было, извлекаем файлы cookie из первоначального ответа
-    cookies = response.cookies
-
-
+response = requests.post(login_url, data=data)
+cookies = response.cookies
 soup = BeautifulSoup(response.content, 'html.parser')
 write_to_file(soup.prettify())
 print(cookies)
@@ -59,16 +41,13 @@ url = 'http://virt.lac.lviv.ua/mod/quiz/attempt.php?attempt=1056132&page=25'  # 
 #     html_content = file.read()
 if response.ok:
     # Отправляем GET-запрос к странице
-    cookie_str = '; '.join([f"{cookie.name}={cookie.value}" for cookie in cookies])
-    response = requests.get(url, headers={'Cookie': cookie_str})
-    print(cookie_str)
+    response = requests.get(url, cookies=cookies)
+    print(response.cookies)
 
     # Проверяем успешность запроса
     if response.status_code == 200:
-        print('200')
         # Создаем объект BeautifulSoup
         soup = BeautifulSoup(response.content, 'html.parser')
-        
         # soup = BeautifulSoup(html_content, 'html.parser')
 
         # Находим блок с вопросом
