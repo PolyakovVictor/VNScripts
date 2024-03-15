@@ -5,16 +5,21 @@ import json
 # Функция для отправки вопросов и вариантов ответов
 
 
+def save_question_and_answer(question, answer, filename='questions_and_answers.txt'):
+    with open(filename, 'a', encoding='utf-8') as file:
+        file.write(question + '\n')
+        file.write('\n'.join(answer) + '\n\n')
+
+
 def send_question_to_chatGPT(question, options):
     # Здесь можно реализовать отправку вопроса и вариантов ответов куда-либо,
     # например, через API или как угодно, в зависимости от вашего интерфейса с мной
     # В этом примере просто печатаем вопрос и варианты ответов
-    print("Вопрос:", question)
-    print("Варианты ответов:", options)
+    save_question_and_answer(question=question, answer=options)
 
 
 def write_to_file(data):
-    with open('index.html', 'w') as file:
+    with open('index.html', 'w', encoding="utf-8") as file:
         file.write(data)
 
 
@@ -33,11 +38,10 @@ headers = {
 
 response = requests.post(login_url, data=data, headers=headers, allow_redirects=True)
 
-print(*response.history[1].cookies)
-
+print('here 3', response.content)
 if response.history:
     # Получаем окончательный ответ после перенаправления
-    final_response = response.history[-1]
+    final_response = response.history[0]
 
     # Извлекаем файлы cookie из окончательного ответа
     cookies = final_response.cookies
@@ -47,8 +51,7 @@ else:
 
 
 soup = BeautifulSoup(response.content, 'html.parser')
-write_to_file(soup.prettify())
-print(cookies)
+print('here 1', cookies)
 
 
 # URL страницы с вопросами и вариантами ответов
@@ -60,15 +63,16 @@ url = 'http://virt.lac.lviv.ua/mod/quiz/attempt.php?attempt=1056132&page=25'  # 
 if response.ok:
     # Отправляем GET-запрос к странице
     cookie_str = '; '.join([f"{cookie.name}={cookie.value}" for cookie in cookies])
-    response = requests.get(url, headers={'Cookie': cookie_str})
-    print(cookie_str)
+    print('here 2', cookie_str)
+    cookies = {cookie_str.split('=')[0]: cookie_str.split('=')[1]}
+    response = requests.get(url, cookies=cookies, allow_redirects=True)
 
     # Проверяем успешность запроса
     if response.status_code == 200:
         print('200')
         # Создаем объект BeautifulSoup
         soup = BeautifulSoup(response.content, 'html.parser')
-        
+        write_to_file(soup.prettify())
         # soup = BeautifulSoup(html_content, 'html.parser')
 
         # Находим блок с вопросом
