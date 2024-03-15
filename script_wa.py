@@ -1,10 +1,15 @@
 import requests
+import os
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 
-cookies_str = 'eu0d6iv5tghd7o1kbqfglst413'
+load_dotenv()
+
+cookies_str = os.getenv('COOKIES')
 cookies = {'MoodleSession': cookies_str}
 # Базовый URL страницы с вопросами и вариантами ответов
-base_url = 'https://virt.lac.lviv.ua/mod/quiz/attempt.php?attempt=1160596'
+print('Please enter test URL:')
+base_url = input()
 
 
 def save_question_and_answer(question, answer, filename='questions_and_answers.txt'):

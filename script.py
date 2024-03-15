@@ -1,7 +1,11 @@
 import requests
-from bs4 import BeautifulSoup
 import json
+import os
+from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 
+
+load_dotenv()
 # Функция для отправки вопросов и вариантов ответов
 
 
@@ -27,8 +31,8 @@ login_url = 'http://virt.lac.lviv.ua/login/index.php'  # Замените на U
 
 
 data = {
-    'username': 'c20-0712-006-02',
-    'password': 'alivudfoa'
+    'username': os.getenv('USERNAME'),
+    'password': os.getenv('PASSWORD')
 }
 
 headers = {
