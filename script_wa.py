@@ -9,8 +9,7 @@ load_dotenv()
 cookies_str = os.getenv('COOKIES')
 cookies = {'MoodleSession': cookies_str}
 # Базовый URL страницы с вопросами и вариантами ответов
-print('Please enter test URL:')
-base_url = input()
+base_url = os.getenv('URL')
 
 
 def save_question_and_answer(question, answer, page_number, filename='questions_and_answers.txt'):
@@ -59,12 +58,14 @@ def main():
             soup = BeautifulSoup(response.content, 'html.parser')
 
             question, answer_options = get_question_and_answer(soup)
-            if question in seen_questions:
-                print("Обнаружено повторение вопроса:", question)
-                break
-            else:
-                seen_questions.add(question)
-                send_question_to_chatGPT(question, answer_options, start_page)
+            # if question in seen_questions:
+            #     print("Обнаружено повторение вопроса:", question)
+            #     break
+            # else:
+            #     seen_questions.add(question)
+            #     send_question_to_chatGPT(question, answer_options, start_page)
+            seen_questions.add(question)
+            send_question_to_chatGPT(question, answer_options, start_page)
         else:
             print("Ошибка при получении страницы:", response.status_code)
             break
